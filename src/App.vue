@@ -19,21 +19,22 @@ import { reactive } from "vue";
     <a v-for="(menuItem, index) in menu" :key="index">{{ menuItem }}</a>
   </div>
 
-  <div class="black-bg" v-if="modalShow === true">
-    <div class="white-bg">
-      <h4>상세페이지</h4>
-      <p>상세페이지내용임</p>
-    </div>
-  </div>
+  <!-- 모달 -->
+  <Modal :renameOneroom="onerooms" :clickNum="clickNum" :modalShow="modalShow" />
+  <Discount />
 
-  <div v-for="(item, index) in products" :key="index">{{ item }}</div>
+  <!-- <Card :onerooms="onerooms" :clickNum="clickNum" :modalShow="modalShow" /> -->
 
-  <div v-for="(item, index) in products" :key="index">
+  <Card :oneroom="oneroom" v-for="(oneroom, idx) in onerooms" :key="idx" />
+
+  <!-- <div v-for="(item, index) in products" :key="index">{{ item }}</div> -->
+
+  <!-- <div v-for="(item, index) in products" :key="index">
     <h4 :style="스타일">{{ item }}</h4>
     <p>{{ price1 }} 만원</p>
     <button @click="() => increase(index)">신고</button>
     <p>신고수 : {{ 신고수[index] }}</p>
-  </div>
+  </div> -->
 
   <!-- <div>
     <h4 :style="스타일">{{ products[1] }}</h4>
@@ -46,11 +47,18 @@ import { reactive } from "vue";
 </template>
 
 <script>
+import data from "./assets/data";
+import DiscountBanner from "./DiscountBanner.vue";
+import Modal from "./Modal.vue";
+import Card from "./Card.vue";
+
 export default {
   name: "App",
 
   data() {
     return {
+      clickNum: 0,
+      onerooms: data,
       modalShow: false,
       신고수: [0, 0, 0],
       menu: ["Home", "Shop", "About"],
@@ -64,7 +72,11 @@ export default {
       this.신고수[index] += 1;
     },
   },
-  components: {},
+  components: {
+    Discount: DiscountBanner,
+    Modal: Modal,
+    Card,
+  },
 };
 </script>
 
