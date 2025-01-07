@@ -4,16 +4,17 @@
       <li>Cancel</li>
     </ul>
     <ul class="header-button-right">
-      <li>Next</li>
+      <li v-if="step !== 2" @click="step++">Next</li>
+      <li v-if="step === 2" @click="publish">발행</li>
     </ul>
     <img src="./assets/logo.svg" class="logo" />
   </div>
 
-  <Container :tabStep="step" @changeTab="step = +$event" />
+  <Container :instarData="instarData" @publish="publish" :step="step" :uploadImage="uploadImage" @writeContent="writeContent = $event" @changeTab="step = $event" />
 
   <div class="footer">
     <ul class="footer-button-plus">
-      <input type="file" id="file" class="inputfile" />
+      <input @change="upload" type="file" accept="image/*" id="file" class="inputfile" />
       <label for="file" class="input-plus">+</label>
     </ul>
   </div>
@@ -21,6 +22,8 @@
 
 <script>
 import Container from "./Container.vue";
+
+import { instarData } from "./assets/instarData";
 export default {
   name: "InstarApp",
   components: {
@@ -28,8 +31,40 @@ export default {
   },
   data() {
     return {
+      uploadImage: "",
       step: 0,
+      instarData,
+      writeContent: "",
     };
+  },
+  methods: {
+    publish() {
+      const myPost = {
+        name: "등록",
+        userImage: "https://picsum.photos/100?random=3",
+        postImage: this.uploadImage,
+        likes: 36,
+        date: "May 15",
+        liked: false,
+        content: this.writeContent,
+        filter: "perpetua",
+      };
+      this.instarData = [myPost, ...this.instarData];
+      this.step = 0;
+    },
+    upload(event) {
+      const file = event.target.files;
+      console.log(file[0], "file");
+
+      // 이미지 보여주는 방법 2가지
+      // FileReader() => 파일 글자로 변환함
+      //URL.createObjectURL()
+      // 이미지의 가상 URL 을 생성해줌
+      // blob 이란? binary데이터를 다룰때 blob이라는 object 에 담아둠
+      const url = URL.createObjectURL(file[0]);
+      this.uploadImage = url;
+      this.step++;
+    },
   },
 };
 </script>

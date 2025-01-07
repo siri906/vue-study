@@ -1,67 +1,68 @@
 <template>
   <div>
-    <button @click="() => changeTab(0)">버튼0</button>
-    <button @click="() => changeTab(1)">버튼1</button>
-    <button @click="() => changeTab(2)">버튼2</button>
-
-    <div v-if="tabStep === 0">
-      <Post
-        v-for="(postItem, idx) in instarData"
-        :key="idx"
-        :postItem="postItem"
-      />
-      <button @click="more">더보기</button>
+    <div>
+      <button @click="changeTab(0)">버튼0</button>
+      <button @click="changeTab(1)">버튼1</button>
+      <button @click="changeTab(2)">버튼2</button>
     </div>
-
-    <!-- 필터선택페이지 -->
-    <div v-if="tabStep === 1">
-      <div class="upload-image"></div>
-      <div class="filters">
-        <div class="filter-1"></div>
-        <div class="filter-1"></div>
-        <div class="filter-1"></div>
-        <div class="filter-1"></div>
-        <div class="filter-1"></div>
+    <div>
+      <div v-if="step === 0">
+        <Post v-for="(postItem, idx) in instarData" :key="idx" :postItem="postItem" />
+        <button @click="more">더보기</button>
       </div>
-    </div>
 
-    <!-- 글작성페이지 -->
-    <div v-if="tabStep === 2">
-      <div class="upload-image"></div>
-      <div class="write">
-        <textarea class="write-box">write!</textarea>
+      <!-- 필터선택페이지 -->
+      <div v-if="step === 1">
+        <div class="upload-image" :style="{ backgroundImage: `url(${uploadImage})` }"></div>
+        <div class="filters">
+          <div class="filter-1"></div>
+          <div class="filter-1"></div>
+          <div class="filter-1"></div>
+          <div class="filter-1"></div>
+          <div class="filter-1"></div>
+        </div>
+      </div>
+
+      <!-- 글작성페이지 -->
+      <div v-if="step === 2">
+        <div class="upload-image" :style="{ backgroundImage: `url(${uploadImage})` }"></div>
+        <div class="write">
+          <textarea @change="writeContent" class="write-box">write!</textarea>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { instarData } from "./assets/instarData";
 import Post from "./Post.vue";
 import axios from "axios";
 
 export default {
   name: "Container",
   data() {
-    return { count: 0, instarData };
+    return { count: 0 };
   },
   components: {
     Post: Post,
   },
   props: {
-    tabStep: Number,
+    instarData: Array,
+    step: Number,
+    uploadImage: String,
   },
   methods: {
     more() {
-      axios
-        .get(`https://codingapple1.github.io/vue/more${this.count}.json`)
-        .then((result) => {
-          this.instarData.push(result.data);
-          this.count += 1;
-        });
+      axios.get(`https://codingapple1.github.io/vue/more${this.count}.json`).then((result) => {
+        this.instarData = [...this.instarData, ...result.data];
+        this.count += 1;
+      });
     },
     changeTab(num) {
-      this.$emit("step", num);
+      this.$emit("changeTab", num);
+    },
+    writeContent(event) {
+      this.$emit("writeContent", event.target.value);
     },
   },
 };
