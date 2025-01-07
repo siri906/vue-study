@@ -20,12 +20,28 @@ import { reactive } from "vue";
   </div>
 
   <!-- 모달 -->
-  <Modal :renameOneroom="onerooms" :clickNum="clickNum" :modalShow="modalShow" />
-  <Discount />
+  <Modal
+    :renameOneroom="onerooms"
+    :clickNum="clickNum"
+    :modalShow="modalShow"
+    @closeModal="modalShow = $event"
+  />
+  <Discount v-if="showDiscount === true" :discountNum="discountNum" />
+
+  <button @click="priceSort">가격순 정렬</button>
+  <button @click="sortBack">정렬 기준</button>
 
   <!-- <Card :onerooms="onerooms" :clickNum="clickNum" :modalShow="modalShow" /> -->
 
-  <Card :oneroom="oneroom" v-for="(oneroom, idx) in onerooms" :key="idx" />
+  <Card
+    @openModal="
+      modalShow = true;
+      clickNum = $event;
+    "
+    :oneroom="oneroom"
+    v-for="(oneroom, idx) in onerooms"
+    :key="idx"
+  />
 
   <!-- <div v-for="(item, index) in products" :key="index">{{ item }}</div> -->
 
@@ -57,8 +73,11 @@ export default {
 
   data() {
     return {
+      showDiscount: true,
+      discountNum: 10,
       clickNum: 0,
       onerooms: data,
+      oneroomsBase: [...data],
       modalShow: false,
       신고수: [0, 0, 0],
       menu: ["Home", "Shop", "About"],
@@ -71,6 +90,25 @@ export default {
     increase(index) {
       this.신고수[index] += 1;
     },
+
+    priceSort() {
+      // map, filter 원본 보존
+      this.onerooms.sort(function (a, b) {
+        return a.price - b.price;
+      });
+    },
+    sortBack() {
+      this.onerooms = [...this.oneroomsBase];
+    },
+  },
+  mounted() {
+    setInterval(() => {
+      if (this.discountNum !== 0) {
+        this.discountNum -= 1;
+      } else {
+        clearInterval(this.discountNum);
+      }
+    }, 1000);
   },
   components: {
     Discount: DiscountBanner,
